@@ -1,5 +1,5 @@
 import requests
-
+torneo = "CIS2020"
 
 def toscana_elenco_partite():
     all_matches = requests.get("https://api.chess.com/pub/club/team-toscana/matches")
@@ -9,7 +9,7 @@ def toscana_elenco_partite():
     for x in finite:
         titolo = x.get("name")
         risultato = x.get("result")
-        if "CIS2020" in titolo:
+        if torneo in titolo:
             print(titolo, risultato)
 
 
@@ -22,7 +22,7 @@ def abruzzo_elenco_partite():
     for x in finite:
         titolo = x.get("name")
         risultato = x.get("result")
-        if "CIS2020" in titolo:
+        if torneo in titolo:
             print(titolo, risultato)
 
 toscana_elenco_partite()
