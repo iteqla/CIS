@@ -9,31 +9,46 @@ class Regione:
         self.partite = None
         self.punteggio = None
 
+
     def elenco_risultati(self, api):
-        self.partite = api.json()
-        self.finite = self.partite["finished"]
+        partite = api.json()
+        finite = partite["finished"]
+        incorso = partite["in_progress"]
+        registrate = partite["registered"]
+        tutte = finite + incorso + registrate
+
         print("\n===== Elenco partite " + self.nome + " =====")
         # il ciclo cerca tutte le partite della squadra che hanno il nome specificato nella variabile torneo
-        for p in self.finite:
+        for p in tutte:
             titolo = p.get("name")
             risultato = p.get("result")
             if torneo in titolo or alternativa in titolo:
-                print(titolo, risultato)
+                if risultato == "win":
+                    print("\033[32m" + titolo)
+                if risultato == "lose":
+                    print("\033[31m" + titolo)
+                if risultato is None:
+                    print("\033[37m" + titolo)
+
 
     def elenco_giocatori(self, api):
-        self.giocatori = api.json()
-        self.tutti = self.giocatori["all_time"]
+        giocatori = api.json()
+        sempre = giocatori["all_time"]
+        weekly = giocatori["weekly"]
+        monthly = giocatori["monthly"]
+        tutti = sempre + weekly + monthly
         print("\n===== Elenco giocatori " + self.nome + " =====")
-        for g in self.tutti:
+        for g in tutti:
             username = g.get("username")
             print(username)
 
 
-toscana = Regione("Toscana")
-toscana.elenco_risultati(requests.get("https://api.chess.com/pub/club/team-toscana/matches"))
-toscana.elenco_giocatori(requests.get("https://api.chess.com/pub/club/team-toscana/members"))
+# toscana = Regione("Toscana")
+# toscana.elenco_risultati(requests.get("https://api.chess.com/pub/club/team-toscana/matches"))
+# toscana.elenco_giocatori(requests.get("https://api.chess.com/pub/club/team-toscana/members"))
+#
+# calabria = Regione("Calabria")
+# calabria.elenco_risultati(requests.get("https://api.chess.com/pub/club/team-calabria/matches"))
 
-calabria = Regione("Calabria")
-calabria.elenco_risultati(requests.get("https://api.chess.com/pub/club/team-calabria/matches"))
-
-
+basilicata = Regione("Basilicata")
+basilicata.elenco_risultati(requests.get("https://api.chess.com/pub/club/team-basilicata/matches"))
