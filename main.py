@@ -13,6 +13,7 @@ class Regione:
         self.partite = api.json()
         self.finite = self.partite["finished"]
         print("\n===== Elenco partite " + self.nome + " =====")
+        # il ciclo cerca tutte le partite della squadra che hanno il nome specificato nella variabile torneo
         for p in self.finite:
             titolo = p.get("name")
             risultato = p.get("result")
