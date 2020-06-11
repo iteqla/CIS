@@ -1,6 +1,7 @@
 import requests
 import datetime
 
+adesso = datetime.datetime.now().replace(microsecond=0)
 torneo = "CIS2020"
 alternativa = "CSI2020"
 partecipanti = {
@@ -17,7 +18,7 @@ partecipanti = {
     "toscana": "https://api.chess.com/pub/club/team-toscana",
     "trentino": "https://api.chess.com/pub/club/team-trentino-sudtirol",
     "veneto": "https://api.chess.com/pub/club/team-veneto"
-}
+    }
 
 
 class Regione:
@@ -64,15 +65,19 @@ class Regione:
 
 
 def stampa_risultati():
-    stampa = open("risultati_" + str(torneo) + ".txt", "w")
-    stampa.write("Risultati " + str(torneo) + " aggiornati al " + str(datetime.datetime.now().replace(microsecond=0)) + "\n")
+    # Funzione per la stampa dei risultati su un file di testo che viene sovrascritto ogni volta
+    stampa = open(str(torneo) + "_risultati" + ".txt", "w")
+    stampa.write("Risultati " + str(torneo) + " aggiornati al " + str(adesso) + "\n")
 
     for nome, api in partecipanti.items():
         squadra = Regione(api)
-        uffa = squadra.elenco_risultati()
+        elenco = squadra.elenco_risultati()
         stampa.write(str("\n===== Elenco partite " + squadra.nome + " ====="))
-        stampa.write("\n" + str(uffa))
+        stampa.write("\n" + str(elenco))
+        print("\n===== Elenco partite " + squadra.nome + " =====")
+        print(elenco)
     stampa.close()
+    print("Raccolta risultati completata.")
 
 
 stampa_risultati()
