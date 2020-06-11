@@ -1,8 +1,22 @@
 import requests
-import json
 
 torneo = "CIS2020"
 alternativa = "CSI2020"
+partecipanti = {
+                "abruzzo": "https://api.chess.com/pub/club/team-abruzzo",
+                "basilicata": "https://api.chess.com/pub/club/team-basilicata",
+                "calabria": "https://api.chess.com/pub/club/team-calabria",
+                "campania": "https://api.chess.com/pub/club/team-napoli-campania",
+                "emilia": "https://api.chess.com/pub/club/team-emilia-romagna",
+                "friuli": "https://api.chess.com/pub/club/udine-e-fvg",
+                "lazio": "https://api.chess.com/pub/club/lazio",
+                "lombardia": "https://api.chess.com/pub/club/i-lumbard",
+                "piemonte": "https://api.chess.com/pub/club/team-piemonte",
+                "sicilia": "https://api.chess.com/pub/club/team-sicilia",
+                "toscana": "https://api.chess.com/pub/club/team-toscana",
+                "trentino": "https://api.chess.com/pub/club/team-trentino-sudtirol",
+                "veneto": "https://api.chess.com/pub/club/team-veneto"
+                }
 
 
 class Regione:
@@ -27,11 +41,13 @@ class Regione:
             avversario = requests.get(p.get("opponent")).json()
             if torneo in titolo or alternativa in titolo:
                 if risultato == "win":
-                    print("\033[32m" + avversario.get("name"))
+                    print("\033[32m" + "(Vinta) " + avversario.get("name"))
                 if risultato == "lose":
-                    print("\033[31m" + avversario.get("name"))
+                    print("\033[31m" + "(Persa) " + avversario.get("name"))
+                if risultato == "draw":
+                    print("\033[37m" + "(Patta) " + avversario.get("name"))
                 if risultato is None:
-                    print("\033[37m" + avversario.get("name"))
+                    print("\033[37m" + "(In corso) " + avversario.get("name"))
 
     def elenco_giocatori(self):
         giocatori = requests.get(self.giocatori).json()
@@ -45,17 +61,7 @@ class Regione:
             print(username)
 
 
-# toscana = Regione("Toscana")
-# toscana.elenco_risultati(requests.get("https://api.chess.com/pub/club/team-toscana/matches"))
-# toscana.elenco_giocatori(requests.get("https://api.chess.com/pub/club/team-toscana/members"))
-#
-# calabria = Regione("Calabria")
-# calabria.elenco_risultati(requests.get("https://api.chess.com/pub/club/team-calabria/matches"))
+for nome, api in partecipanti.items():
+    squadra = Regione(api)
+    squadra.elenco_risultati()
 
-basilicata = Regione("https://api.chess.com/pub/club/team-basilicata")
-basilicata.elenco_risultati()
-# basilicata.elenco_giocatori()
-
-toscana = Regione("https://api.chess.com/pub/club/team-toscana")
-toscana.elenco_risultati()
-# toscana.elenco_giocatori()
