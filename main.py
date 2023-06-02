@@ -1,83 +1,50 @@
-import requests
 import datetime
+from region import Region
 
 adesso = datetime.datetime.now().replace(microsecond=0)
-torneo = "CIS2020"
-alternativa = "CSI2020"
+torneo = "CIS2023"
+alternativa = "CSI2023"
 partecipanti = {
-    "abruzzo": "https://api.chess.com/pub/club/team-abruzzo",
-    "basilicata": "https://api.chess.com/pub/club/team-basilicata",
-    "calabria": "https://api.chess.com/pub/club/team-calabria",
-    "campania": "https://api.chess.com/pub/club/team-napoli-campania",
-    "emilia": "https://api.chess.com/pub/club/team-emilia-romagna",
-    "friuli": "https://api.chess.com/pub/club/udine-e-fvg",
-    "lazio": "https://api.chess.com/pub/club/lazio",
-    "lombardia": "https://api.chess.com/pub/club/i-lumbard",
-    "piemonte": "https://api.chess.com/pub/club/team-piemonte",
-    "sicilia": "https://api.chess.com/pub/club/team-sicilia",
-    "toscana": "https://api.chess.com/pub/club/team-toscana",
-    "trentino": "https://api.chess.com/pub/club/team-trentino-sudtirol",
-    "veneto": "https://api.chess.com/pub/club/team-veneto"
-    }
+    "Abruzzo": "https://api.chess.com/pub/club/team-abruzzo",
+    "Basilicata": "https://api.chess.com/pub/club/team-basilicata",
+    "Calabria": "https://api.chess.com/pub/club/team-calabria",
+    "Emilia-Romagna": "https://api.chess.com/pub/club/team-emilia-romagna",
+    "Lazio": "https://api.chess.com/pub/club/lazio",
+    "Liguria": "https://api.chess.com/pub/club/team-liguria",
+    "Lombardia": "https://api.chess.com/pub/club/i-lumbard",
+    "Marche": "https://api.chess.com/pub/club/team-marche",
+    "Piemonte": "https://api.chess.com/pub/club/team-piemonte",
+    "Puglia": "https://api.chess.com/pub/club/team-puglia",
+    "Sardegna": "https://api.chess.com/pub/club/sardegna",
+    "Sicilia": "https://api.chess.com/pub/club/team-sicilia",
+    "Toscana": "https://api.chess.com/pub/club/team-toscana",
+    "Trentino-Südtirol": "https://api.chess.com/pub/club/team-trentino-sudtirol",
+    "Veneto": "https://api.chess.com/pub/club/team-veneto",
+    "Valle d'Aosta": "https://api.chess.com/pub/club/team-valle-daosta",
+}
 
 
-class Regione:
-    def __init__(self, api):
-        self.nome = requests.get(api).json().get("name")
-        self.giocatori = api + "/members"
-        self.partite = api + "/matches"
-        self.punteggio = None
-
-    def elenco_risultati(self):
-        partite = requests.get(self.partite).json()
-        finite = partite["finished"]
-        incorso = partite["in_progress"]
-        registrate = partite["registered"]
-        tutte = finite + incorso + registrate
-        result = ""
-
-        # il ciclo cerca tutte le partite della squadra che hanno il nome specificato nella variabile torneo
-        for p in tutte:
-            titolo = p.get("name")
-            risultato = p.get("result")
-            avversario = requests.get(p.get("opponent")).json()
-            if torneo in titolo or alternativa in titolo:
-                if risultato == "win":
-                    result += "(Vinta) " + avversario.get("name") + "\n"
-                elif risultato == "lose":
-                    result += "(Persa) " + avversario.get("name") + "\n"
-                elif risultato == "draw":
-                    result += "(Patta) " + avversario.get("name") + "\n"
-                elif risultato is None:
-                    result += "(In corso) " + avversario.get("name") + "\n"
-        return result
-
-    def elenco_giocatori(self):
-        giocatori = requests.get(self.giocatori).json()
-        sempre = giocatori["all_time"]
-        weekly = giocatori["weekly"]
-        monthly = giocatori["monthly"]
-        tutti = sempre + weekly + monthly
-        print("\n===== Elenco giocatori " + self.nome + " =====")
-        for g in tutti:
-            username = g.get("username")
-            print(username)
-
-
-def stampa_risultati():
-    # Funzione per la stampa dei risultati su un file di testo che viene sovrascritto ogni volta
-    stampa = open(str(torneo) + "_risultati" + ".txt", "w")
-    stampa.write("Risultati " + str(torneo) + " aggiornati al " + str(adesso) + "\n")
+def print_results():
+    results_file = open(str(torneo) + "_risultati" + ".txt", "w")
+    results_file.write("Risultati " + str(torneo) + " aggiornati al " + str(adesso) + "\n")
+    print("Risultati " + str(torneo) + " aggiornati al " + str(adesso) + "\n")
 
     for nome, api in partecipanti.items():
-        squadra = Regione(api)
-        elenco = squadra.elenco_risultati()
-        stampa.write(str("\n===== Elenco partite " + squadra.nome + " ====="))
-        stampa.write("\n" + str(elenco))
-        print("\n===== Elenco partite " + squadra.nome + " =====")
-        print(elenco)
-    stampa.close()
-    print("Raccolta risultati completata.")
+        region = Region(nome, api, torneo, alternativa)
+        results = region.get_all_matches_results()
+        results_text = "\n".join(results)
+        results_file.write("\n===== Elenco partite " + region.name + " =====\n")
+        results_file.write(results_text + "\n")
+        print("\n===== Elenco partite " + region.name + " =====")
+        print(results_text)
+
+    print("\nRaccolta risultati completata per tutte le squadre partecipanti.")
+    results_file.write("\nRaccolta risultati completata per tutte le squadre partecipanti.")
+    results_file.close()
+
+def main():
+    print_results()
 
 
-stampa_risultati()
+if __name__ == "__main__":
+    main()
